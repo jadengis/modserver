@@ -22,6 +22,8 @@ func TestUserWorkflow(t *testing.T) {
 	if err != nil {
 		t.FailNow()
 	}
+	defer client.DeleteUser(context.Background(), response.GetUser().GetId())
+
 	getResponse, err := client.GetUser(context.Background(), response.GetUser().GetId())
 	if err != nil {
 		t.FailNow()
@@ -29,6 +31,7 @@ func TestUserWorkflow(t *testing.T) {
 	if response.User.Id.Value != getResponse.User.Id.Value {
 		t.Errorf("The id value is effed: out: %d != in: %d", response.User.Id.Value, getResponse.User.Id.Value)
 	}
+
 }
 
 func dialConnection() (*grpc.ClientConn, error) {
