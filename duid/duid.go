@@ -5,6 +5,7 @@
 package duid
 
 import (
+	"sync"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type IdGenerator interface {
 
 // Generator is a generator of distributed unique ids.
 type generator struct {
+	mutex sync.Mutex
 	// uniqueKey is a machine-specific identifier to keep ids unique across a network.
 	// The type here is set specifically to uint8 as is must be bounded my 255 in order
 	// the generation algorithm to work, as there are only 8 bits reserved in the final
@@ -33,6 +35,8 @@ type generator struct {
 // NewId for will generate a new id based on the current time, internal uniqueKey
 // and sequence number currently set within the generator.
 func (g *generator) NewId() int {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 	var id = 0
 	var now = time.Now().UnixNano()
 	id |= int(now) & zeroLowShort
